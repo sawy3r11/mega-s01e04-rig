@@ -1,0 +1,80 @@
+name: Preview digest on GitHub Pages
+
+on:
+  workflow_dispatch:
+    inputs:
+      include_marker:
+        description: Include the lane marker in this public preview
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Require marker secret when requested
+        if: inputs.include_marker
+        env:
+          LANE_MARKER: ${{ secrets.LANE_MARKER }}
+        run: test -n "$LANE_MARKER"
+
+      - name: Export preview
+        env:
+          LANE_MARKER: ${{ inputs.include_marker && secrets.LANE_MARKER || '' }}
+        run: ./scripts/export-preview.sh var/preview/index.html
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: var/preview
+          retention-days: 1
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+      actions: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Delete this run's uploaded Pages artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          artifact_ids="$(gh api --paginate \
+            "/repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
+            --jq '.artifacts[] | select(.name == "github-pages" and .workflow_run.id == (env.GITHUB_RUN_ID | tonumber)) | .id')"
+          if [[ -z "$artifact_ids" ]]; then
+            echo "Could not find this run's Pages artifact to delete" >&2
+            exit 1
+          fi
+          while IFS= read -r artifact_id; do
+            [[ -z "$artifact_id" ]] || gh api --method DELETE \
+              "/repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}"
+          done <<< "$artifact_ids"
