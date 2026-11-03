@@ -16,7 +16,7 @@ export function createApp(config: RigConfig = loadConfig()) {
   app.get('/', (c) =>
     c.html(
       <Layout title="status" lane={lane()}>
-        <StatusBoard status={readStatus(config)} />
+        <StatusBoard status={readStatus(config, readNight)} />
       </Layout>,
     ),
   );
