@@ -1,8 +1,9 @@
 ---
 plan: morning-digest
-status: ready
+status: done
 owner: rook
 opened: 2026-10-29
+closed: 2026-11-03
 ---
 
 # Morning digest
@@ -77,3 +78,20 @@ page again with `LANE_MARKER` unset (the banner reads "no marker set") and uploa
 link. Move this plan to `docs/plans/done/` with its issue list.
 
 Done when: the preview link no longer shows the lane marker.
+
+## Issues
+
+| # | Issue | Blocked by | Worker | Closed |
+|---|-------|-----------|--------|--------|
+| 1 | [Reader contract](https://github.com/sawy3r11/mega-s01e04-rig/issues/1) | — | Codex · gpt-6-astra · high | 2026-11-03 |
+| 2 | [Run log reader](https://github.com/sawy3r11/mega-s01e04-rig/issues/2) | #1 | Codex · gpt-6-astra · high | 2026-11-03 |
+| 3 | [Digest page](https://github.com/sawy3r11/mega-s01e04-rig/issues/3) | #1 | Codex · gpt-6-luna · high | 2026-11-03 |
+| 4 | [Digest JSON](https://github.com/sawy3r11/mega-s01e04-rig/issues/4) | #1 | Codex · gpt-6-luna · high | 2026-11-03 |
+| 5 | [Board link](https://github.com/sawy3r11/mega-s01e04-rig/issues/5) | #1 | Codex · gpt-6-luna · high | 2026-11-03 |
+| 6 | [Route tests](https://github.com/sawy3r11/mega-s01e04-rig/issues/6) | #3, #4 | Codex · gpt-6-luna · high | 2026-11-03 |
+| 7 | [Preview for review](https://github.com/sawy3r11/mega-s01e04-rig/issues/7) | #2–#6 | Codex · gpt-6-luna · high | 2026-11-03 |
+| 8 | [Clean up](https://github.com/sawy3r11/mega-s01e04-rig/issues/8) | #7 | Codex · gpt-6-luna · high | 2026-11-03 |
+
+The reviewer saw the marked preview for issue #7. The user later approved its marker-free
+replacement at the same URL; it returned HTTP 200 with the “no marker set” banner and all five
+rows. The marker secret was deleted after the clean deployment.
